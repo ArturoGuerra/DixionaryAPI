@@ -12,7 +12,7 @@ async def dixionary(request):
         logger.debug(request.headers)
         message = request.text
         if isinstance(message, str):
-            logger.debug(f"Request Info: {message}")
+            logger.info(f"Request Info: {message}")
             splitmsg = message.split(' ')
             return_message = list()
             for word in splitmsg:
@@ -23,7 +23,6 @@ async def dixionary(request):
                 if vord:
                     return_message.append(vord)
             if len(return_message) > 0:
-                logger.info(f"Request Info: {message}")
                 logger.info(f"Sending: {return_message}")
             return request.Response(code=200, json=return_message, encoding='utf-8')
         else:
