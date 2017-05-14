@@ -1,9 +1,18 @@
 import json
 
-with open('config.json', 'r') as f:
-    config = json.load(f)
-
-dbname = config['dbname']
-dbuser = config['dbuser']
-dbpass = config['dbpass']
-dbhost = config['dbhost']
+class Config():
+    def __init__(self):
+       with open('config.json', 'r') as f:
+        self.__config = json.load(f)
+    @property
+    def dbname(self):
+        return self.__config['dbname']
+    @property
+    def dbuser(self):
+        return self.__config['dbuser']
+    @property
+    def dbpass(self):
+        return self.__config['dbpass']
+    @property
+    def dbhost(self):
+        return self.__config['dbhost']

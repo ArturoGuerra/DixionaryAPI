@@ -1,6 +1,7 @@
 from peewee import *
 import pymysql
 import config
+config = config.Config()
 
 my_db = MySQLDatabase(
     config.dbname,
