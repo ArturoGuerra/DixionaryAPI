@@ -1,15 +1,19 @@
 from japronto import Application
 from models import *
 import logging
-
+import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('dixionaryapi')
 
 async def dixionary(request):
     try:
+        full_string = False
         logger.info(f"Request Address: {request.remote_addr}")
         logger.debug(f"Route used: {request.route}")
         logger.debug(request.headers)
+        if "Full_String" in request.headers:
+            if request.headers['Full_String'].lower() == 'true':
+                full_string = True
         message = request.text
         if isinstance(message, str):
             logger.info(f"Request Info: {message}")
@@ -21,9 +25,13 @@ async def dixionary(request):
                 except:
                     vord = None
                 if vord:
+                    idx = splitmsg.index(word)
+                    splitmsg[idx].replace(word, vord)
                     return_message.append(vord)
             if len(return_message) > 0:
                 logger.info(f"Sending: {return_message}")
+                if full_string:
+                    return request.Response(code=200, json=splitmsg, encoding='utf-8')
             return request.Response(code=200, json=return_message, encoding='utf-8')
         else:
             return request.Response(code=400)
