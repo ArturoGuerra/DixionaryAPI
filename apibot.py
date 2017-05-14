@@ -19,19 +19,23 @@ async def dixionary(request):
             logger.info(f"Request Info: {message}")
             splitmsg = message.split(' ')
             return_message = list()
+            full_return_msg = list()
             for word in splitmsg:
                 try:
                     vord = Dixionary.get(Dixionary.word == word.lower()).vord
                 except:
                     vord = None
                 if vord:
-                    idx = splitmsg.index(word)
-                    splitmsg[idx].replace(word, vord)
+                    full_return_msg.append(vord)
                     return_message.append(vord)
+                else:
+                    full_return_msg.append(word)
+
             if len(return_message) > 0:
-                logger.info(f"Sending: {return_message}")
                 if full_string:
-                    return request.Response(code=200, json=splitmsg, encoding='utf-8')
+                    logger.info(f"Sending: {full_return_msg}")
+                    return request.Response(code=200, json=full_return_msg, encoding='utf-8')
+                logger.info(f"Sending: {return_message}")
             return request.Response(code=200, json=return_message, encoding='utf-8')
         else:
             return request.Response(code=400)
