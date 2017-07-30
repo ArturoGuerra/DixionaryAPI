@@ -1,9 +1,13 @@
 from peewee import *
 import pymysql
 import config
+from playhouse.shortcuts import RetryOperationalError
 config = config.Config()
 
-my_db = MySQLDatabase(
+class MyRetryDB(RetryOperationalError, MySQLDatabase):
+        pass
+
+my_db = MyRetryDB(
     config.dbname,
     host=config.dbhost,
     port=3306,
