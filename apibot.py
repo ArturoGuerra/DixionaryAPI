@@ -54,7 +54,7 @@ def remove_vord():
 
 def list_vords():
     try:
-        apikey = Apikeys.select().where(Apikeys.apikey == request.text)
+        apikey = Apikeys.select().where(Apikeys.apikey == request.data.decode("utf-8"))
     except Exception:
         apikey = None
     if not apikey:
