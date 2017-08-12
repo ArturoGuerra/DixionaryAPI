@@ -17,7 +17,8 @@ router.use('/get', function(req, res) {
         var reqmessage = req.body.message.split(' ');
     } catch (e) {
         var reqmessage = [];
-        res.status(400).send("Invalid Method");
+        console.log("DixionaryAPI: 400 Bad Request");
+        res.status(400).send("400 Bad Request");
     }
     var indexs = 0;
     reqmessage.forEach((word,index,array) => {
