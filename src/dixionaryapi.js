@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const routes = require('./routes');
 const compression = require('compression');
 const minify = require('express-minify');
+const path = require('path');
 
 const app = exports.app = express();
 
@@ -18,13 +19,22 @@ app.use('/api', routes);
 
 function startServer() {
     // Creates unix socket
+    var socketfile = path.join(__dirname, "dixionaryapi.sock");
+    fs.unlink(socketfile, (err) => {
+        if (err) {
+            console.log("Socket file doesn't exist");
+        } else {
+            console.log("Removed socket file");
+        }
+    });
     var server = http.createServer(app);
-    server.listen("./dixionaryapi.sock");
+    server.listen(socketfile);
     server.on('listening', onListening);
     function onListening() {
-        fs.chmodSync('./dixionaryapi.sock', '775');
+        fs.chmodSync(socketfile, '775');
         console.log("Started unix socked");
     };
+
     // Deletes socket file
     function servershutdown () {
         server.close();
