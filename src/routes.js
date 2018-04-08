@@ -1,6 +1,5 @@
 const dixionaryapi = require('./dixionaryapi.js');
 const express = require('express');
-const app = dixionaryapi.app;
 const router = express.Router();
 const database = require('./database.js');
 const redis = require('redis');

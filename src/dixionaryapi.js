@@ -2,7 +2,6 @@
 const http = require('http');
 const express = require('express');
 const fs = require('fs');
-const redis = require('redis');
 const bodyParser = require("body-parser");
 const routes = require('./routes');
 const compression = require('compression');
@@ -11,7 +10,6 @@ const path = require('path');
 
 const app = exports.app = express();
 
-app.use(bodyParser.urlencoded({extended: false }));
 app.use(bodyParser.json());
 app.use(compression());
 app.use(minify());
