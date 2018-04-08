@@ -11,6 +11,13 @@ client.on('error', function(err) {
     console.log("Error" + err);
 });
 
+router.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+
 router.use('/get', function(req, res) {
     var message = [];
     try {
@@ -49,14 +56,26 @@ router.use('/get', function(req, res) {
 });
 
 
+function getIndex(index) {
+  return index * 20
+}
+
 router.use('/fetch', function(req, res) {
-    var message = [];
-    Dixionary.findAll({}).then(item => {
-        item.forEach(entry => {
-            message.push({english: entry.word, scammer: entry.vord});
-        });
-        res.json(message);
+  let params = {}
+  if (req.query.index) {
+    let raw_index = parseInt(req.query.index)
+    let index = getIndex(raw_index)
+    params.offset = index
+    params.limit = 20
+  }
+  console.log(params);
+  var message = [];
+  Dixionary.findAll(params).then(item => {
+    item.forEach(entry => {
+      message.push({ english: entry.word, scammer: entry.vord });
     });
+    res.json(message);
+  });
 });
 
 
