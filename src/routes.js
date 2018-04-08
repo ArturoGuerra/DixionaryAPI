@@ -1,10 +1,10 @@
-const dixionaryapi = require('./dixionaryapi.js');
-const express = require('express');
-const router = express.Router();
+const { Router } = require('express');
 const database = require('./database.js');
 const redis = require('redis');
-var Dixionary = database.dixionary;
-var client = redis.createClient();
+
+const router = Router();
+const Dixionary = database.dixionary;
+const client = redis.createClient();
 
 client.on('error', function(err) {
     console.log("Error" + err);
@@ -15,7 +15,6 @@ router.use((req, res, next) => {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-
 
 router.use('/get', function(req, res) {
     var message = [];
@@ -54,7 +53,6 @@ router.use('/get', function(req, res) {
     });
 });
 
-
 function getIndex(index) {
   return index * 20
 }
@@ -77,7 +75,6 @@ router.use('/fetch', function(req, res) {
   });
 });
 
-
 router.use('/status', function(req, res) {
     var responce = {
         description: "api",
@@ -86,6 +83,5 @@ router.use('/status', function(req, res) {
     }
     res.json(responce);
 });
-
 
 module.exports = router
