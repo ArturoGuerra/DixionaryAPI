@@ -9,6 +9,15 @@ const minify = require('express-minify');
 const path = require('path');
 
 const app = exports.app = express();
+const httpServer = http.createServer(app);
+
+const host = process.env.HOST || '0.0.0.0'
+const port = process.env.PORT || 3000
+const socket = process.env.SOCKET || null
+
+app.set('host', host)
+app.set('port', port)
+app.set('socket', socket)
 
 app.use(bodyParser.json());
 app.use(compression());
@@ -16,28 +25,17 @@ app.use(minify());
 app.use('/api', routes);
 
 function startServer() {
-    // Creates unix socket
-    var socketfile = path.join(__dirname, "dixionaryapi.sock");
-    fs.unlink(socketfile, (err) => {
-        if (err) {
-            console.log("Socket file doesn't exist");
-        } else {
-            console.log("Removed socket file");
-        }
-    });
-    var server = http.createServer(app);
-    server.listen(socketfile);
-    server.on('listening', onListening);
-    function onListening() {
-        fs.chmodSync(socketfile, '775');
-        console.log("Started unix socked");
-    };
-
-    // Deletes socket file
-    function servershutdown () {
-        server.close();
+  if (socket) {
+    if (fs.existsSync(socket)) {
+      fs.unlinkSync(socket)
     }
-    process.on('SIGINT', servershutdown);
+    httpServer.listen(socket, () => { console.log('Server listening on ' + socket) })
+    fs.chmodSync(socket, '0777')
+  } else {
+    httpServer.listen(port, host, () => {
+      console.log('Server listening on ' + host + ':' + port)
+    })
+  }
 }
 
 if (require.main == module) {
