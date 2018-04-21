@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const routes = require('./routes');
 const compression = require('compression');
 const minify = require('express-minify');
+const morgan = require('morgan');
 const path = require('path');
 
 const app = exports.app = express();
@@ -19,6 +20,7 @@ app.set('host', host)
 app.set('port', port)
 app.set('socket', socket)
 
+app.use(morgan('tiny'));
 app.use(bodyParser.json());
 app.use(compression());
 app.use(minify());
