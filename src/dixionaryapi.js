@@ -15,12 +15,17 @@ const httpServer = http.createServer(app);
 const host = process.env.HOST || '0.0.0.0'
 const port = process.env.PORT || 3000
 const socket = process.env.SOCKET || null
+const dev_mode = (!process.env.NODE_ENV === 'production')
 
 app.set('host', host)
 app.set('port', port)
 app.set('socket', socket)
 
-app.use(morgan('tiny'));
+if (!dev_mode) {
+  app.set('trust proxy', function (){ return true })
+}
+
+app.use(morgan('short'));
 app.use(bodyParser.json());
 app.use(compression());
 app.use(minify());
