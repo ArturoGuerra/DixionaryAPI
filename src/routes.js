@@ -1,14 +1,8 @@
 const { Router } = require('express');
 const database = require('./database.js');
-const redis = require('redis');
 
 const router = Router();
 const Dixionary = database.dixionary;
-const client = redis.createClient();
-
-client.on('error', function(err) {
-    console.log("Error" + err);
-});
 
 router.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -16,56 +10,36 @@ router.use((req, res, next) => {
   next();
 });
 
-router.use('/get', function(req, res) {
-    var message = [];
-    try {
-        var reqmessage = req.body.message.split(' ');
-    } catch (e) {
-        var reqmessage = [];
-        console.log("DixionaryAPI: 400 Bad Request");
-        res.status(400).send("400 Bad Request");
-    }
-    var indexs = 0;
-    reqmessage.forEach((word,index,array) => {
-        client.get(word, function(clienterr, clientres) {
-            if (clientres) {
-                indexs++;
-                var result = clientres;
-                message.push({scammer: result, english: word});
-            } else {
-                var wait = true;
-                Dixionary.findOne({ where: {word: word}}).then(function(result) {
-                    if (result) {
-                        client.set(word, result.vord);
-                        message.push({scammer: result.vord, english: word});
-                    } else {
-                        message.push({scammer: word, english: word});
-                    }
-                    indexs++;
-                    if ((wait) && indexs == array.length) { res.json(message);};
-                })
-            }
-            if ((!wait) && indexs == array.length) {
-                console.log("Done");
-                res.json(message);
-            }
-        });
-    });
+router.get('/get', verifyMessageBody, TranslateBody, async (req, res) => {
+  res.json(req.message);
 });
 
-function getIndex(index) {
-  return index * 20
-}
 
-router.use('/fetch', function(req, res) {
+router.get('/translate', verifyMessageBody, TranslateBody, async (req, res) => {
+  let message = req.message
+  let result = ''
+
+  for (let i =0; i < message.length; i++) {
+    result = result + ' ' + message[i].scammer
+  }
+
+  let parsed = result.replace(/(^\s+|\s+$)/g,'')
+
+  res.send(parsed)
+})
+
+router.get('/fetch', (req, res) => {
   let params = {}
+
   if (req.query.index) {
     let raw_index = parseInt(req.query.index)
     let index = getIndex(raw_index)
     params.offset = index
     params.limit = 20
   }
+
   console.log(params);
+
   var message = [];
   Dixionary.findAll(params).then(item => {
     item.forEach(entry => {
@@ -75,13 +49,42 @@ router.use('/fetch', function(req, res) {
   });
 });
 
-router.use('/status', function(req, res) {
-    var responce = {
-        description: "api",
-        apiname: "dixionary",
-        status: "operational"
-    }
-    res.json(responce);
-});
+function getIndex (index) {
+  return index * 20
+}
+
+function verifyMessageBody (req, res, next) {
+  try {
+    let message = req.query.message.split(' ');
+    req.message = message;
+    next()
+  } catch (e) {
+    console.log("DixionaryAPI: 400 Bad Request");
+    res.status(400).send("400 Bad Request");
+  }
+}
+
+async function Translate (word) {
+  try {
+    let result = await Dixionary.findOne({ where: { word: word } })
+    return result.vord
+  } catch (e) {
+    return word
+  }
+}
+
+async function TranslateBody (req, res, next) {
+  let message = []
+  let req_message = req.message
+
+  for (let i = 0; i < req_message.length; i++) {
+    let word = req_message[i]
+    let vord = await Translate(word)
+    message.push({ scammer: vord, english: word })
+  }
+
+  req.message = message
+  next()
+}
 
 module.exports = router
