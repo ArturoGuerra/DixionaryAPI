@@ -1,14 +1,11 @@
+const cors = require('cors');
 const { Router } = require('express');
 const database = require('./database.js');
 
 const router = Router();
 const Dixionary = database.dixionary;
 
-router.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+router.use(cors())
 
 router.get('/get', verifyMessageBody, TranslateBody, async (req, res) => {
   res.json(req.message);
