@@ -4,8 +4,6 @@ const express = require('express');
 const fs = require('fs');
 const bodyParser = require("body-parser");
 const routes = require('./routes');
-const compression = require('compression');
-const minify = require('express-minify');
 const morgan = require('morgan');
 const path = require('path');
 
@@ -27,8 +25,6 @@ if (!dev_mode) {
 
 app.use(morgan('short'));
 app.use(bodyParser.json());
-app.use(compression());
-app.use(minify());
 app.use('/api', routes);
 
 function startServer() {
