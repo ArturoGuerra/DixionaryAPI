@@ -4,6 +4,7 @@
   "description": "DixionaryAPI",
   "main": "dixionaryapi.js",
   "dependencies": {
+    "aws-serverless-express": "^3.2.0",
     "body-parser": "^1.17.2",
     "cors": "^2.8.4",
     "dynamodb": "^1.1.1",
@@ -11,11 +12,18 @@
     "expressjs": "^1.0.1",
     "joi": "^13.2.0",
     "morgan": "^1.9.0",
-    "mysql2": "^1.4.0"
+    "mysql2": "^1.4.0",
+    "serverless": "^1.27.1",
+    "serverless-domain-manager": "^2.3.6"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serverless:production": "serverless deploy",
+    "serverless:dev": "serverless deploy --stage dev",
+    "serverless:remove": "serverless remove",
+    "serverless:createdomain": "serverless create_domain",
+    "serverless:deletedomain": "serverless delete_domain"
   },
   "author": "Arturo Guerra",
   "license": "ISC"
